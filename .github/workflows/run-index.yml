@@ -4,6 +4,9 @@ on:
   workflow_dispatch:   # manual trigger
   schedule:
     - cron: "0 0 * * *"   # run every midnight UTC
+  push:
+    branches:
+      - main
 
 jobs:
   run-ts:
