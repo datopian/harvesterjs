@@ -1,0 +1,18 @@
+name: Run index.ts
+
+on:
+  workflow_dispatch:   # manual trigger
+  schedule:
+    - cron: "0 0 * * *"   # run every midnight UTC
+
+jobs:
+  run-ts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - run: npm install
+      - run: npx ts-node index.ts
