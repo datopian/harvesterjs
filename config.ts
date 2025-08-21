@@ -19,7 +19,7 @@ const EnvSchema = z.object({
   RETRY_BASE_MS: z.coerce.number().default(500),
   DRY_RUN: z.preprocess(v => String(v).toLowerCase() === "true", z.boolean()).default(false),
 
-  SINCE_ISO: z.iso.datetime().optional(),
+  SINCE_ISO: z.string().optional(),
   STATE_FILE: z.string().default(".harvest_state.json"),
 });
 

@@ -1,4 +1,4 @@
-export type PortalJSDataset = {
+export interface PortalJSDataset {
   name: string;
   title?: string;
   category: string;
@@ -15,4 +15,4 @@ export type PortalJSDataset = {
     format?: string;
     mimetype?: string;
   }>;
-};
+}

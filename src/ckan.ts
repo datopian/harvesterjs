@@ -1,40 +1,52 @@
+import CkanRequest, { CkanResponse } from "@portaljs/ckan-api-client-js";
 import { env } from "../config";
-import { CkanDataset } from "../interfaces/ckan.dataset"
+import { CkanDataset } from "../types/ckan.dataset";
 
-const CKAN_API = `${env.CKAN_BASE_URL.replace(/\/$/, "")}/api/3/action`;
-
-function authHeaders():any {
-  return env.CKAN_API_KEY ? { "Authorization": env.CKAN_API_KEY } : {};
+interface PackageSearchResult {
+  count: number;
+  results: CkanDataset[];
 }
 
-export async function *iterCkanDatasets() {
-  // Use package_search with pagination; optional org filter; optional modified-since filter
-  const pageSize = 100; // CKAN default max often 1000, but keep modest
+export async function* iterSourcePackages(pageSize = 25) {
   let start = 0;
 
   const fqParts: string[] = [];
-  if (env.CKAN_ORG_ID) fqParts.push(`organization:${JSON.stringify(env.CKAN_ORG_ID)}`);
+
+  if (env.CKAN_ORG_ID)
+    fqParts.push(`organization:${JSON.stringify(env.CKAN_ORG_ID)}`);
+
   if (env.SINCE_ISO) fqParts.push(`metadata_modified:[${env.SINCE_ISO} TO *]`);
-  const fq = fqParts.length ? fqParts.join(" ") : undefined;
+
+  const fqString = fqParts.join(" ");
 
   while (true) {
-    const url = new URL(`${CKAN_API}/package_search`);
-    url.searchParams.set("rows", String(pageSize));
-    url.searchParams.set("start", String(start));
-    if (fq) url.searchParams.set("fq", fq);
+    const params = new URLSearchParams({
+      rows: String(pageSize),
+      start: String(start),
+    });
+    if (fqString) params.set("fq", fqString);
 
-    const res = await fetch(url, { headers: { "Content-Type": "application/json", ...authHeaders() } });
-    if (!res.ok) throw new Error(`CKAN search failed: ${res.status} ${res.statusText}`);
-    const body = await res.json();
-    if (!body.success) throw new Error("CKAN response unsuccessful");
+    const action = `package_search?${params.toString()}`;
 
-    const results: CkanDataset[] = body.result.results;
+    const pkgSearch = await CkanRequest.get<CkanResponse<PackageSearchResult>>(
+      action,
+      {
+        ckanUrl: env.CKAN_BASE_URL,
+      }
+    );
+
+    if (pkgSearch.error) {
+      throw new Error(
+        `CKAN response unsuccessful: ${JSON.stringify(pkgSearch.error)}`
+      );
+    }
+
+    const results = pkgSearch.result.results;
     if (!results.length) break;
 
     for (const ds of results) yield ds;
 
     start += results.length;
-    const total = body.result.count as number;
-    if (start >= total) break;
+    if (start >= pkgSearch.result.count) break;
   }
 }

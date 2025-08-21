@@ -1,13 +1,15 @@
+import CkanRequest, { CkanResponse } from "@portaljs/ckan-api-client-js";
 import { env } from "../config";
-import type { PortalJSDataset } from "../interfaces/portaljs.dataset.js";
+import type { PortalJSDataset } from "../types/portaljs.dataset.js";
 
-const BASE = env.PORTALJS_BASE_URL.replace(/\/$/, "");
+const targetCkanUrl = env.PORTALJS_BASE_URL.replace(/\/$/, "");
+
+let allDatasets = getAllDatasets();
 
 function headers() {
-  console.log(env.PORTALJS_API_TOKEN)
   return {
     "Content-Type": "application/json",
-    "Authorization": `${env.PORTALJS_API_TOKEN}`,
+    Authorization: `${env.PORTALJS_API_TOKEN}`,
   };
 }
 
@@ -17,15 +19,12 @@ export async function upsertPortalDataset(payload: PortalJSDataset) {
     throw new Error("Dataset payload must include a 'name' field.");
   }
 
-  // 1. Check if dataset exists
-  const exists = await datasetExists(datasetName);
+  const exists = (await allDatasets).find((d) => d === datasetName) ? true : false;
 
-  // 2. Choose endpoint
   const endpoint = exists
-    ? `${BASE}/api/3/action/package_update`
-    : `${BASE}/api/3/action/package_create`;
+    ? `${targetCkanUrl}/api/3/action/package_update`
+    : `${targetCkanUrl}/api/3/action/package_create`;
 
-  // 3. Send request
   const res = await fetch(endpoint, {
     method: "POST",
     headers: headers(),
@@ -35,15 +34,22 @@ export async function upsertPortalDataset(payload: PortalJSDataset) {
   if (!res.ok) {
     const text = await res.text();
     throw new Error(
-      `CKAN ${exists ? "update" : "create"} failed: ${res.status} ${res.statusText} — ${text}`
+      `CKAN ${exists ? "update" : "create"} failed: ${res.status} ${
+        res.statusText
+      } — ${text}`
     );
   }
 
   return res.json();
 }
 
-async function datasetExists(name: string): Promise<boolean> {
-  const res = await fetch(`${BASE}/api/3/action/package_show?id=${encodeURIComponent(name)}`);
-
-  return res.ok;
+async function getAllDatasets(): Promise<String[]> {
+  const datasets = await CkanRequest.get<CkanResponse<String[]>>(
+    "package_list",
+    {
+      ckanUrl: targetCkanUrl,
+    }
+  );
+  return datasets.result;
 }
+
