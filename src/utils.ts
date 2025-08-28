@@ -4,7 +4,10 @@ export function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-export async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
+export async function withRetry<T>(
+  fn: () => Promise<T>,
+  label: string
+): Promise<T> {
   let attempt = 0;
   const max = env.RETRY_MAX_ATTEMPTS;
   while (true) {
@@ -21,3 +24,6 @@ export async function withRetry<T>(fn: () => Promise<T>, label: string): Promise
     }
   }
 }
+
+export const capitalize = (str: string) =>
+  str.charAt(0).toUpperCase() + str.slice(1);

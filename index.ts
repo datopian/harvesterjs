@@ -29,7 +29,6 @@ async function main() {
     const job = async () => {
       try {
         const payload = mapCkanToPortalJS(ds, env.PORTALJS_ORG_ID);
-
         await withRetry(() => upsertPortalDataset(payload), `upsert ${ds.name}`);
         upserts++;
       } catch (err: any) {

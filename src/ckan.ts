@@ -1,10 +1,10 @@
 import CkanRequest, { CkanResponse } from "@portaljs/ckan-api-client-js";
 import { env } from "../config";
-import { CkanDataset } from "../types/ckan.dataset";
+import { SourceSchema } from "../schemas/source-schema";
 
 interface PackageSearchResult {
   count: number;
-  results: CkanDataset[];
+  results: SourceSchema[];
 }
 
 export async function* iterSourcePackages(pageSize = 25) {
@@ -12,8 +12,8 @@ export async function* iterSourcePackages(pageSize = 25) {
 
   const fqParts: string[] = [];
 
-  if (env.CKAN_ORG_ID)
-    fqParts.push(`organization:${JSON.stringify(env.CKAN_ORG_ID)}`);
+  if (env.SOURCE_CKAN_ORG_ID)
+    fqParts.push(`organization:${JSON.stringify(env.SOURCE_CKAN_ORG_ID)}`);
 
   if (env.SINCE_ISO) fqParts.push(`metadata_modified:[${env.SINCE_ISO} TO *]`);
 
@@ -31,7 +31,7 @@ export async function* iterSourcePackages(pageSize = 25) {
     const pkgSearch = await CkanRequest.get<CkanResponse<PackageSearchResult>>(
       action,
       {
-        ckanUrl: env.CKAN_BASE_URL,
+        ckanUrl: env.SOURCE_CKAN_URL,
       }
     );
 
