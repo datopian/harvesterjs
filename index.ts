@@ -1,8 +1,8 @@
 import Bottleneck from "bottleneck";
 import { env } from "./config";
-import { iterSourcePackages } from "./src/ckan";
+import { iterSourcePackages } from "./src/source";
 import { mapCkanToPortalJS } from "./src/map";
-import { upsertPortalDataset } from "./src/cloud";
+import { upsertPortalDataset } from "./src/target";
 import { readState, writeState } from "./src/state";
 import { withRetry } from "./src/utils";
 

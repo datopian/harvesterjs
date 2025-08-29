@@ -2,10 +2,11 @@
   "name": "portaljs-ckan-harverster",
   "version": "1.0.0",
   "scripts": {
-    "start": "ts-node index.ts",
+    "start": "ts-node gen-schema && ts-node index.ts",
     "build": "tsc"
   },
   "devDependencies": {
+    "@types/node": "^24.3.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   },
