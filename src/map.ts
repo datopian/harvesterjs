@@ -11,7 +11,7 @@ export function mapCkanToPortalJS(ds: SourceSchema, owner_org: string): TargetSc
       name: r.name,
       url: r.url,
       format: r.format,
-      id:""
+      ...(r.id ? { id: r.id } : {}),
     })),
 
     language:ds.language || "EN"

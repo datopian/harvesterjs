@@ -32,6 +32,7 @@ export async function* iterSourcePackages(pageSize = 25) {
       action,
       {
         ckanUrl: env.SOURCE_CKAN_URL,
+        apiKey: env.SOURCE_CKAN_API_KEY || undefined,
       }
     );
 
