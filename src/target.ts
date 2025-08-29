@@ -1,19 +1,19 @@
 import CkanRequest, { CkanResponse } from "@portaljs/ckan-api-client-js";
 import { env } from "../config";
-import type { PortalJSDataset } from "../types/portaljs.dataset.js";
+import type { TargetSchema } from "../schemas/target-schema";
 
-const targetCkanUrl = env.PORTALJS_BASE_URL.replace(/\/$/, "");
+const targetCkanUrl = env.PORTALJS_CKAN_URL.replace(/\/$/, "");
 
 let allDatasets = getAllDatasets();
 
 function headers() {
   return {
     "Content-Type": "application/json",
-    Authorization: `${env.PORTALJS_API_TOKEN}`,
+    Authorization: `${env.PORTALJS_CKAN_API_KEY}`,
   };
 }
 
-export async function upsertPortalDataset(payload: PortalJSDataset) {
+export async function upsertPortalDataset(payload: TargetSchema) {
   const datasetName = payload.name;
   if (!datasetName) {
     throw new Error("Dataset payload must include a 'name' field.");
