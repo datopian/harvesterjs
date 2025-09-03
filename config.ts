@@ -7,7 +7,6 @@ import { z } from "zod";
 const EnvSchema = z.object({
   SOURCE_CKAN_URL: z.string().url(),
   SOURCE_CKAN_API_KEY: z.string().optional(),
-  SOURCE_CKAN_ORG_ID: z.string().optional(),
 
   PORTALJS_CKAN_URL: z.string().url(),
   PORTALJS_CKAN_API_KEY: z.string().min(1),
