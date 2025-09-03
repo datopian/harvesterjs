@@ -1,6 +1,6 @@
 import CkanRequest, { CkanResponse } from "@portaljs/ckan-api-client-js";
 import { env } from "../../config";
-import { BaseHarvester } from "./baseHarvester";
+import { BaseHarvester } from "./base";
 import { PortalJsPackage } from "@/schemas/portalJsPackage";
 import { CkanPackage } from "@/schemas/ckanPackage";
 
@@ -50,7 +50,7 @@ export class CkanHarvester extends BaseHarvester<CkanPackage, PortalJsPackage> {
   }
 
   mapPackage(pkg: CkanPackage): PortalJsPackage {
-    const owner_org = env.PORTALJS_ORG_ID;
+    const owner_org = env.PORTALJS_ORG_ID; // TODO: get this automatically based on the main org of the PortalJS Cloud token
     return {
       owner_org,
       name: `${owner_org}--${pkg.name}`,

@@ -1,6 +1,6 @@
 import Bottleneck from "bottleneck";
 import { env } from "./config";
-import { CkanHarvester } from "./src/harvesters/ckanHarvester";
+import { CkanHarvester } from "./src/harvesters/ckan";
 import { upsertPortalDataset } from "./src/target";
 import { withRetry } from "./src/utils";
 
@@ -24,7 +24,7 @@ async function main() {
 
     const job = async () => {
       try {
-        await withRetry(() => upsertPortalDataset(pkg), `upsert ${pkg.name}`);
+        await withRetry(() => upsertPortalDataset(pkg, env.DRY_RUN), `upsert ${pkg.name}`);
         upserts++;
       } catch (err: any) {
         failures++;

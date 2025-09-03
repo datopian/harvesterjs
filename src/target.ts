@@ -13,13 +13,24 @@ function headers() {
   };
 }
 
-export async function upsertPortalDataset(payload: PortalJsPackage) {
+export async function upsertPortalDataset(
+  payload: PortalJsPackage,
+  dryRun = false,
+) {
   const datasetName = payload.name;
   if (!datasetName) {
     throw new Error("Dataset payload must include a 'name' field.");
   }
 
-  const exists = (await allDatasets).find((d) => d === datasetName) ? true : false;
+  const exists = (await allDatasets).find((d) => d === datasetName)
+    ? true
+    : false;
+
+  if (dryRun) {
+    console.log(`[dry run]: ${exists ? "updating" : "adding"} ${JSON.stringify(payload, null, 4)}`);
+
+    return payload;
+  }
 
   const endpoint = exists
     ? `${targetCkanUrl}/api/3/action/package_update`
@@ -36,7 +47,7 @@ export async function upsertPortalDataset(payload: PortalJsPackage) {
     throw new Error(
       `CKAN ${exists ? "update" : "create"} failed: ${res.status} ${
         res.statusText
-      } — ${text}`
+      } — ${text}`,
     );
   }
 
@@ -48,8 +59,7 @@ async function getAllDatasets(): Promise<String[]> {
     "package_list",
     {
       ckanUrl: targetCkanUrl,
-    }
+    },
   );
   return datasets.result;
 }
-
