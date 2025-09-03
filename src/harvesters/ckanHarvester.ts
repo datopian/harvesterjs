@@ -1,7 +1,6 @@
 import CkanRequest, { CkanResponse } from "@portaljs/ckan-api-client-js";
 import { env } from "../../config";
 import { BaseHarvester } from "./baseHarvester";
-
 import { PortalJsPackage } from "@/schemas/portalJsPackage";
 import { CkanPackage } from "@/schemas/ckanPackage";
 
@@ -11,29 +10,18 @@ interface PackageSearchResult {
 }
 
 export class CkanHarvester extends BaseHarvester<CkanPackage, PortalJsPackage> {
-  constructor(url:string,since:string) {
-    super(url,since);
+  constructor(url:string) {
+    super(url);
   }
 
   async *iterSourcePackages(pageSize = 25): AsyncGenerator<CkanPackage> {
     let start = 0;
-
-    const fqParts: string[] = [];
-
-    if (env.SOURCE_CKAN_ORG_ID)
-      fqParts.push(`organization:${JSON.stringify(env.SOURCE_CKAN_ORG_ID)}`);
-
-    if (this.sinceISO)
-      fqParts.push(`metadata_modified:[${this.sinceISO} TO *]`);
-
-    const fqString = fqParts.join(" ");
 
     while (true) {
       const params = new URLSearchParams({
         rows: String(pageSize),
         start: String(start),
       });
-      if (fqString) params.set("fq", fqString);
 
       const action = `package_search?${params.toString()}`;
 

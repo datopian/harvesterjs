@@ -2,14 +2,10 @@ import Bottleneck from "bottleneck";
 import { env } from "./config";
 import { CkanHarvester } from "./src/harvesters/ckanHarvester";
 import { upsertPortalDataset } from "./src/target";
-import { readState, writeState } from "./src/state";
 import { withRetry } from "./src/utils";
 
 async function main() {
   const startTime = Date.now();
-  const state = await readState();
-  const since = env.SINCE_ISO || state.lastRunISO;
-  console.log(since ? `Incremental mode since ${since}` : `Full harvest mode`);
 
   const limiter = new Bottleneck({
     minTime: Math.ceil(1000 / Math.max(1, env.RATE_LIMIT_RPS)),
@@ -21,7 +17,7 @@ async function main() {
   let failures = 0;
   const jobs: Promise<void>[] = [];
 
-  const harvester = new CkanHarvester(env.SOURCE_CKAN_URL, since ?? "");
+  const harvester = new CkanHarvester(env.SOURCE_CKAN_URL);
 
   for await (const pkg of harvester.run()) {
     total++;
@@ -40,8 +36,6 @@ async function main() {
   }
 
   await Promise.all(jobs);
-
-  await writeState({ lastRunISO: new Date().toISOString() });
 
   const duration = ((Date.now() - startTime) / 1000).toFixed(2);
 

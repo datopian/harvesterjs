@@ -19,8 +19,6 @@ const EnvSchema = z.object({
   RETRY_BASE_MS: z.coerce.number().default(500),
   DRY_RUN: z.coerce.boolean().default(false),
 
-  SINCE_ISO: z.string().optional(),
-  STATE_FILE: z.string().default(".harvest_state.json"),
 });
 
 export type Env = z.infer<typeof EnvSchema>;
