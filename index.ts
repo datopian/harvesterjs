@@ -1,7 +1,6 @@
 import Bottleneck from "bottleneck";
 import { env } from "./config";
-import { iterSourcePackages } from "./src/source";
-import { mapCkanToPortalJS } from "./src/map";
+import { CkanHarvester } from "./src/harversters/ckanHarvester";
 import { upsertPortalDataset } from "./src/target";
 import { readState, writeState } from "./src/state";
 import { withRetry } from "./src/utils";
@@ -20,21 +19,20 @@ async function main() {
   let total = 0;
   let upserts = 0;
   let failures = 0;
-
   const jobs: Promise<void>[] = [];
 
-  for await (const ds of iterSourcePackages()) {
+  const harvester = new CkanHarvester();
+
+  for await (const pkg of harvester.run()) {
     total++;
 
     const job = async () => {
       try {
-        const payload = mapCkanToPortalJS(ds, env.PORTALJS_ORG_ID);
-        await withRetry(() => upsertPortalDataset(payload), `upsert ${ds.name}`);
+        await withRetry(() => upsertPortalDataset(pkg), `upsert ${pkg.name}`);
         upserts++;
       } catch (err: any) {
-        console.log(err)
         failures++;
-        console.error(`✖ Failed ${ds.name}:`, err?.message || err);
+        console.error(`✖ Failed ${pkg.name}:`, err?.message || err);
       }
     };
 
@@ -46,6 +44,7 @@ async function main() {
   await writeState({ lastRunISO: new Date().toISOString() });
 
   const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+
   console.log(
     `\n✅ Done. total=${total}, upserts=${upserts}, failures=${failures} (${duration}s)`
   );
