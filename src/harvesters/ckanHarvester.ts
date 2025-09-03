@@ -40,7 +40,7 @@ export class CkanHarvester extends BaseHarvester<CkanPackage, PortalJsPackage> {
       const pkgSearch = await CkanRequest.get<
         CkanResponse<PackageSearchResult>
       >(action, {
-        ckanUrl: env.SOURCE_CKAN_URL,
+        ckanUrl: this.sourceUrl,
         apiKey: env.SOURCE_CKAN_API_KEY || undefined,
       });
 
