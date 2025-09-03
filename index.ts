@@ -1,6 +1,6 @@
 import Bottleneck from "bottleneck";
 import { env } from "./config";
-import { CkanHarvester } from "./src/harversters/ckanHarvester";
+import { CkanHarvester } from "./src/harvesters/ckanHarvester";
 import { upsertPortalDataset } from "./src/target";
 import { readState, writeState } from "./src/state";
 import { withRetry } from "./src/utils";
@@ -21,7 +21,7 @@ async function main() {
   let failures = 0;
   const jobs: Promise<void>[] = [];
 
-  const harvester = new CkanHarvester();
+  const harvester = new CkanHarvester(env.SOURCE_CKAN_URL, since ?? "");
 
   for await (const pkg of harvester.run()) {
     total++;

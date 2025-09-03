@@ -10,9 +10,9 @@ interface PackageSearchResult {
   results: CkanPackage[];
 }
 
-export class CkanHarvester extends BaseHarvester {
-  constructor() {
-    super(env.SOURCE_CKAN_URL);
+export class CkanHarvester extends BaseHarvester<CkanPackage, PortalJsPackage> {
+  constructor(url:string,since:string) {
+    super(url,since);
   }
 
   async *iterSourcePackages(pageSize = 25): AsyncGenerator<CkanPackage> {
@@ -23,8 +23,8 @@ export class CkanHarvester extends BaseHarvester {
     if (env.SOURCE_CKAN_ORG_ID)
       fqParts.push(`organization:${JSON.stringify(env.SOURCE_CKAN_ORG_ID)}`);
 
-    if (env.SINCE_ISO)
-      fqParts.push(`metadata_modified:[${env.SINCE_ISO} TO *]`);
+    if (this.sinceISO)
+      fqParts.push(`metadata_modified:[${this.sinceISO} TO *]`);
 
     const fqString = fqParts.join(" ");
 
