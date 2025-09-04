@@ -7,10 +7,6 @@ const portalConfig = {
   ckanApiToken: env.PORTALJS_CLOUD_API_KEY,
 };
 
-// TODO: this is not right, because in PortalJS Cloud
-// we have to get datasets that belong to a specific
-// org. Also, this endpoint retrieves data based on a
-// limit
 export async function getDatasetList() {
   return (
     await Ckan.getDatasetsByOrganization({
