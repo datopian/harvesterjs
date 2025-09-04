@@ -13,7 +13,7 @@ export type BaseHarvesterConfig = {
   dryRun?: boolean;
 };
 
-export abstract class BaseHarvester<SourceDatasetT = any> {
+export abstract class BaseHarvester<SourceDatasetT extends {[k: string]: string} = any> {
   protected config: BaseHarvesterConfig;
 
   constructor(config: BaseHarvesterConfig) {
