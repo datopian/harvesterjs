@@ -1,3 +1,4 @@
+import { PortalJsCloudDataset } from "@/schemas/portaljs-cloud";
 import CkanRequest, { CkanResponse } from "@portaljs/ckan-api-client-js";
 
 type CkanActionConfig = {
@@ -9,18 +10,40 @@ type CkanProtectedActionConfig = CkanActionConfig & {
   ckanApiToken: string;
 };
 
-export async function getDatasetsList({
+export async function getDatasetsByOrganization({
   ckanUrl,
   ckanApiToken,
-}: CkanActionConfig) {
-  const datasets = await CkanRequest.get<CkanResponse<string[]>>(
-    "package_list",
-    {
+  organizationId,
+}: CkanActionConfig & { organizationId: string }) {
+  let allResults: PortalJsCloudDataset[] = [];
+  let start = 0;
+  const rows = 1000; 
+
+  while (true) {
+    const url = `package_search?q=organization:${organizationId}&start=${start}&rows=${rows}`;
+    const response = await CkanRequest.get<{
+      success: boolean;
+      result: {
+        count: number;
+        results: any[];
+      };
+    }>(url, {
       ckanUrl,
       apiKey: ckanApiToken,
-    },
-  );
-  return datasets.result;
+    });
+
+    if (!response.success) {
+      throw new Error("CKAN request failed");
+    }
+
+    allResults = allResults.concat(response.result.results);
+
+    if (allResults.length >= response.result.count) break;
+
+    start += rows;
+  }
+
+  return allResults;
 }
 
 export async function searchDatasets<DatasetSchemaT = any>({

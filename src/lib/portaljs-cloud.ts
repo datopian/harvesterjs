@@ -12,7 +12,12 @@ const portalConfig = {
 // org. Also, this endpoint retrieves data based on a
 // limit
 export async function getDatasetList() {
-  return await Ckan.getDatasetsList(portalConfig);
+  return (
+    await Ckan.getDatasetsByOrganization({
+      ...portalConfig,
+      organizationId: env.PORTALJS_CLOUD_MAIN_ORG,
+    })
+  ).map((ds) => ds.name);
 }
 
 export async function createDataset(dataset: PortalJsCloudDataset) {
@@ -49,7 +54,11 @@ export async function upsertDataset({
 
   if (dryRun) {
     console.log(
-      `[dry run]: ${exists ? "updating" : "adding"} ${JSON.stringify(dataset, null, 4)}`,
+      `[dry run]: ${exists ? "updating" : "adding"} ${JSON.stringify(
+        dataset,
+        null,
+        4
+      )}`
     );
 
     return dataset;
