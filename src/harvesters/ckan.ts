@@ -6,7 +6,7 @@ import { Harvester } from ".";
 import { getAllDatasets } from "../lib/ckan";
 
 @Harvester
-class CkanHarvester extends BaseHarvester<CkanPackage> {
+class CkanHarvester<SourceDatasetT extends CkanPackage = CkanPackage> extends BaseHarvester<SourceDatasetT> {
   constructor(args: BaseHarvesterConfig) {
     super(args);
   }
@@ -18,7 +18,7 @@ class CkanHarvester extends BaseHarvester<CkanPackage> {
     });
   }
 
-  mapSourceDatasetToTarget(pkg: CkanPackage): PortalJsCloudDataset {
+  mapSourceDatasetToTarget(pkg: SourceDatasetT): PortalJsCloudDataset {
     const owner_org = env.PORTALJS_CLOUD_MAIN_ORG; // TODO: get this automatically based on the main org of the PortalJS Cloud token
     return {
       owner_org,
