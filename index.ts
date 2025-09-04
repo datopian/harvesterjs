@@ -1,54 +1,25 @@
-import Bottleneck from "bottleneck";
 import { env } from "./config";
-import { iterSourcePackages } from "./src/source";
-import { mapCkanToPortalJS } from "./src/map";
-import { upsertPortalDataset } from "./src/target";
-import { readState, writeState } from "./src/state";
-import { withRetry } from "./src/utils";
+import { HARVESTERS } from "./src/harvesters";
+import { BaseHarvester, BaseHarvesterConfig } from "./src/harvesters/base";
 
 async function main() {
-  const startTime = Date.now();
-  const state = await readState();
-  const since = env.SINCE_ISO || state.lastRunISO;
-  console.log(since ? `Incremental mode since ${since}` : `Full harvest mode`);
+  const HarvesterCls = HARVESTERS.get(env.HARVESTER_NAME);
 
-  const limiter = new Bottleneck({
-    minTime: Math.ceil(1000 / Math.max(1, env.RATE_LIMIT_RPS)),
-    maxConcurrent: Math.max(1, env.CONCURRENCY),
-  });
-
-  let total = 0;
-  let upserts = 0;
-  let failures = 0;
-
-  const jobs: Promise<void>[] = [];
-
-  for await (const ds of iterSourcePackages()) {
-    total++;
-
-    const job = async () => {
-      try {
-        const payload = mapCkanToPortalJS(ds, env.PORTALJS_ORG_ID);
-        await withRetry(() => upsertPortalDataset(payload), `upsert ${ds.name}`);
-        upserts++;
-      } catch (err: any) {
-        console.log(err)
-        failures++;
-        console.error(`✖ Failed ${ds.name}:`, err?.message || err);
-      }
-    };
-
-    jobs.push(limiter.schedule(job));
+  if (!HarvesterCls) {
+    throw new Error("Harvester not found");
   }
 
-  await Promise.all(jobs);
+  const harvester = new HarvesterCls({
+    source: {
+      url: env.SOURCE_API_URL,
+      apiKey: env.SOURCE_API_KEY,
+      rps: env.RATE_LIMIT_RPS,
+      concurrency: env.CONCURRENCY,
+    },
+    dryRun: env.DRY_RUN
+  } as BaseHarvesterConfig) as BaseHarvester;
 
-  await writeState({ lastRunISO: new Date().toISOString() });
-
-  const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-  console.log(
-    `\n✅ Done. total=${total}, upserts=${upserts}, failures=${failures} (${duration}s)`
-  );
+  await harvester.run();
 }
 
 main().catch((err) => {

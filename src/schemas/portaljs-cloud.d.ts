@@ -1,5 +1,5 @@
 // Auto-generated from CKAN schema
-export interface TargetSchema {
+export interface PortalJsCloudDataset {
   title?: string;
   name: string;
   notes?: string;
