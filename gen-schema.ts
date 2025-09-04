@@ -1,7 +1,7 @@
 // generate-types.ts
 import fs from "fs";
 import { env } from "./config";
-import { capitalize } from "./src/utils";
+import { capitalize } from "./src/lib/utils";
 
 interface SchemaField {
   field_name: string;

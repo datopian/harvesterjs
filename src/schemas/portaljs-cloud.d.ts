@@ -1,5 +1,5 @@
 // Auto-generated from CKAN schema
-export interface PortalJsPackage {
+export interface PortalJsCloudDataset {
   title?: string;
   name: string;
   notes?: string;
