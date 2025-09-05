@@ -1,6 +1,6 @@
 # PortalJS Harvesters
 
-This repo provides a **pluggable harvester runner** to pull datasets from external sources and upsert them into **PortalJS Cloud** .
+This repo provides a **harvester runner** to pull datasets from external sources and upsert them into **PortalJS Cloud** .
 
 ---
 
