@@ -7,10 +7,13 @@ jobs:
   run-harvester:
     runs-on: ubuntu-latest
     env:
-      CKAN_URL: ${{ secrets.CKAN_URL }}
-      CKAN_API_KEY: ${{ secrets.CKAN_API_KEY }}
-      PORTALJS_CLOUD_URL: ${{ secrets.PORTALJS_CLOUD_URL }}
+      HARVESTER_NAME: ${{ secrets.HARVESTER_NAME }}
+      SOURCE_API_URL: ${{ secrets.SOURCE_API_URL }}
+      SOURCE_API_KEY: ${{ secrets.SOURCE_API_KEY }}
+      PORTALJS_CLOUD_API_URL: ${{ secrets.PORTALJS_CLOUD_API_URL }}
       PORTALJS_CLOUD_API_KEY: ${{ secrets.PORTALJS_CLOUD_API_KEY }}
+      PORTALJS_CLOUD_MAIN_ORG: ${{ secrets.PORTALJS_CLOUD_MAIN_ORG }}
+      
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
