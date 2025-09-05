@@ -1,0 +1,27 @@
+name: Run Harvester
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-harvester:
+    runs-on: ubuntu-latest
+    env:
+      CKAN_URL: ${{ secrets.CKAN_URL }}
+      CKAN_API_KEY: ${{ secrets.CKAN_API_KEY }}
+      PORTALJS_CLOUD_URL: ${{ secrets.PORTALJS_CLOUD_URL }}
+      PORTALJS_CLOUD_API_KEY: ${{ secrets.PORTALJS_CLOUD_API_KEY }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Harvester
+        run: npx ts-node index.ts
