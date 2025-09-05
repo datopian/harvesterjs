@@ -6,14 +6,7 @@ on:
 jobs:
   run-harvester:
     runs-on: ubuntu-latest
-    env:
-      HARVESTER_NAME: ${{ secrets.HARVESTER_NAME }}
-      SOURCE_API_URL: ${{ secrets.SOURCE_API_URL }}
-      SOURCE_API_KEY: ${{ secrets.SOURCE_API_KEY }}
-      PORTALJS_CLOUD_API_URL: ${{ secrets.PORTALJS_CLOUD_API_URL }}
-      PORTALJS_CLOUD_API_KEY: ${{ secrets.PORTALJS_CLOUD_API_KEY }}
-      PORTALJS_CLOUD_MAIN_ORG: ${{ secrets.PORTALJS_CLOUD_MAIN_ORG }}
-      
+    
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -27,4 +20,11 @@ jobs:
         run: npm install
 
       - name: Run Harvester
+        env:
+          HARVESTER_NAME: ${{ secrets.HARVESTER_NAME }}
+          SOURCE_API_URL: ${{ secrets.SOURCE_API_URL }}
+          SOURCE_API_KEY: ${{ secrets.SOURCE_API_KEY }}
+          PORTALJS_CLOUD_API_URL: ${{ secrets.PORTALJS_CLOUD_API_URL }}
+          PORTALJS_CLOUD_API_KEY: ${{ secrets.PORTALJS_CLOUD_API_KEY }}
+          PORTALJS_CLOUD_MAIN_ORG: ${{ secrets.PORTALJS_CLOUD_MAIN_ORG }}
         run: npx ts-node index.ts
