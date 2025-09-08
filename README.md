@@ -15,7 +15,10 @@ Configuration is done via the following environment variables, which can be set 
 - `PORTALJS_CLOUD_MAIN_ORG`: Main organization name
 
 
-## Extending: add a new harvester
+## Custom Harvesters
+
+In order to create custom harvesters for data sources that are not natively supported, you can:
+
 
 1. Create `src/harvesters/custom.ts`.
 2. Extend `BaseHarvester` and decorate with `@Harvester`.
