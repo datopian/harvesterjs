@@ -13,7 +13,9 @@ export type BaseHarvesterConfig = {
   dryRun?: boolean;
 };
 
-export abstract class BaseHarvester<SourceDatasetT extends {[k: string]: string} = any> {
+export abstract class BaseHarvester<
+  SourceDatasetT extends { [k: string]: string } = any
+> {
   protected config: BaseHarvesterConfig;
 
   constructor(config: BaseHarvesterConfig) {
@@ -22,22 +24,15 @@ export abstract class BaseHarvester<SourceDatasetT extends {[k: string]: string}
 
   abstract getSourceDatasets(): Promise<SourceDatasetT[]>;
   abstract mapSourceDatasetToTarget(
-    dataset: SourceDatasetT,
+    dataset: SourceDatasetT
   ): PortalJsCloudDataset;
 
   async getTargetPreexistingDatasets(): Promise<string[]> {
     return await getDatasetList();
   }
-  async upsertIntoTarget({
-    dataset,
-    preexistingDatasets,
-  }: {
-    dataset: PortalJsCloudDataset;
-    preexistingDatasets: string[];
-  }) {
+  async upsertIntoTarget({ dataset }: { dataset: PortalJsCloudDataset }) {
     return await upsertDataset({
       dataset,
-      preexistingDatasets,
       dryRun: this.config.dryRun,
     });
   }
@@ -53,8 +48,6 @@ export abstract class BaseHarvester<SourceDatasetT extends {[k: string]: string}
     let upserts = 0;
     let failures = 0;
 
-    const preexistingDatasets = await this.getTargetPreexistingDatasets();
-
     const sourceDatasets = await this.getSourceDatasets();
     for (const sourcePkg of sourceDatasets) {
       total++;
@@ -66,9 +59,8 @@ export abstract class BaseHarvester<SourceDatasetT extends {[k: string]: string}
             () =>
               this.upsertIntoTarget({
                 dataset: targetPackage,
-                preexistingDatasets,
               }),
-            `upsert ${targetPackage.name}`,
+            `upsert ${targetPackage.name}`
           );
           upserts++;
         } catch (err: any) {
@@ -81,7 +73,7 @@ export abstract class BaseHarvester<SourceDatasetT extends {[k: string]: string}
     await Promise.all(jobs);
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
     console.log(
-      `\n✅ Done. total=${total}, upserts=${upserts}, failures=${failures} (${duration}s)`,
+      `\n✅ Done. total=${total}, upserts=${upserts}, failures=${failures} (${duration}s)`
     );
   }
 }
