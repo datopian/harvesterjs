@@ -4,7 +4,9 @@ This repo provides a **harvester runner** to pull datasets from external sources
 
 ---
 
-## Config env variables
+## Configuration
+
+Configuration is done via the following environment variables, which can be set in a `.env` file (see `.env.example`):
 - `HARVESTER_NAME`: name of the harvester type
   - Built-in: **CkanHarvester** pulls from CKAN via `package_search` and maps into PortalJS Cloud.
 - `SOURCE_API_URL`: source api url
