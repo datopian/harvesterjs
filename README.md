@@ -29,7 +29,7 @@ In order to create custom harvesters for data sources that are not natively supp
 
 The base class handles **concurrency, rate limit, retries, upsert**
 
-### Example
+### Example: Harvester for a CKAN instance with a custom dataset metadata schema
 
 ```js
 import { PortalJsCloudDataset } from "@/schemas/portaljs-cloud";
