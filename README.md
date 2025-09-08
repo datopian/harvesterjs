@@ -21,7 +21,7 @@ In order to create custom harvesters for data sources that are not natively supp
 
 
 1. Create `src/harvesters/custom.ts`.
-2. Extend `BaseHarvester` and decorate with `@Harvester`.
+2. Extend `BaseHarvester` (or any other pre-built harvester class) and decorate with `@Harvester`.
 3. Implement:
    * `getSourceDatasets()` → fetch and return all datasets from your source.
    * `mapSourceDatasetToTarget()` → convert source dataset into the target schema.
