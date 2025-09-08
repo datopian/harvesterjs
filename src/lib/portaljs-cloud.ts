@@ -1,6 +1,7 @@
 import * as Ckan from "./ckan";
 import { env } from "../../config";
 import { PortalJsCloudDataset } from "@/schemas/portaljs-cloud";
+import { CkanRequestError } from "@portaljs/ckan-api-client-js";
 
 const portalConfig = {
   ckanUrl: env.PORTALJS_CLOUD_API_URL,
@@ -33,37 +34,35 @@ export async function updateDataset(dataset: PortalJsCloudDataset) {
 export async function upsertDataset({
   dataset,
   dryRun = false,
-  preexistingDatasets,
 }: {
   dataset: PortalJsCloudDataset;
   dryRun?: boolean;
-  preexistingDatasets: string[];
 }) {
   const datasetName = dataset.name;
   if (!datasetName) {
     throw new Error("Dataset must have a 'name' field.");
   }
 
-  const exists = preexistingDatasets.find((d) => d === datasetName)
-    ? true
-    : false;
-
   if (dryRun) {
-    console.log(
-      `[dry run]: ${exists ? "updating" : "adding"} ${JSON.stringify(
-        dataset,
-        null,
-        4
-      )}`
-    );
-
+    console.log(`[dry run]: upsert ${JSON.stringify(dataset, null, 4)}`);
     return dataset;
   }
 
-  const action = exists ? updateDataset : createDataset;
   try {
-    return await action(dataset);
-  } catch (e) {
-    throw new Error(`CKAN ${exists ? "update" : "create"} failed: ${e}`);
+    return await createDataset(dataset);
+  } catch (creationError) {
+    if (
+      creationError instanceof CkanRequestError &&
+      creationError.message.includes("URL is already in use")
+    ) {
+      console.log(`CKAN update dataset: ${dataset.name}`);
+      try {
+        return await updateDataset(dataset);
+      } catch (updateError) {
+        throw new Error(`CKAN update failed: ${updateError}`);
+      }
+    } else {
+      throw new Error("CKAN create failed:" + creationError);
+    }
   }
 }
