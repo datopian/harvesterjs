@@ -59,10 +59,10 @@ export async function upsertDataset({
       try {
         return await updateDataset(dataset);
       } catch (updateError) {
-        throw new Error(`CKAN update failed: ${updateError}`);
+        throw updateError
       }
     } else {
-      throw new Error("CKAN create failed:" + creationError);
+      throw creationError
     }
   }
 }
