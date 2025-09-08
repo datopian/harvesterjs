@@ -1,5 +1,6 @@
 import { PortalJsCloudDataset } from "@/schemas/portaljs-cloud";
 import CkanRequest, { CkanResponse } from "@portaljs/ckan-api-client-js";
+import { buildOrFq } from "./utils";
 
 type CkanActionConfig = {
   ckanUrl: string;
@@ -17,19 +18,15 @@ export async function getDatasetsByOrganization({
 }: CkanActionConfig & { organizationId: string }) {
   let allResults: PortalJsCloudDataset[] = [];
   let start = 0;
-  const rows = 1000; 
+  const rows = 25;
 
   while (true) {
-    const url = `package_search?q=organization:${organizationId}&start=${start}&rows=${rows}`;
-    const response = await CkanRequest.get<{
-      success: boolean;
-      result: {
-        count: number;
-        results: any[];
-      };
-    }>(url, {
+    const response = await searchDatasets({
       ckanUrl,
-      apiKey: ckanApiToken,
+      ckanApiToken,
+      start: start,
+      rows: rows,
+      organization: organizationId,
     });
 
     if (!response.success) {
@@ -51,14 +48,23 @@ export async function searchDatasets<DatasetSchemaT = any>({
   ckanApiToken,
   rows = 25,
   start = 0,
-  // TODO: implement the rest of the accepted parameters
-}: CkanActionConfig & {
+  organization,
+}: // TODO: implement the rest of the accepted parameters
+CkanActionConfig & {
   rows?: number;
   start?: number;
+  organization?: string;
 }) {
+  const fq = [];
+
+  if (organization) {
+    fq.push(buildOrFq("organization", [organization]));
+  }
+
   const searchParams = new URLSearchParams({
     rows: String(rows),
     start: String(start),
+    fq: fq.join("+"),
   });
 
   return await CkanRequest.get<

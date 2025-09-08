@@ -27,3 +27,6 @@ export async function withRetry<T>(
 
 export const capitalize = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
+
+export const buildOrFq = (key: string, values: string[]) =>
+  `${key}:(${values.join(" OR ")})`;
