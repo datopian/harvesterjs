@@ -7,9 +7,10 @@ This repo provides a **harvester runner** to pull datasets from external sources
 ## Configuration
 
 Configuration is done via the following environment variables, which can be set in a `.env` file (see `.env.example`):
-- `HARVESTER_NAME`: name of the harvester type
+- `HARVESTER_NAME`: Name of the harvester type
   - Built-in: **CkanHarvester** pulls from CKAN via `package_search` and maps into PortalJS Cloud.
-- `SOURCE_API_URL`: source api url
+- `SOURCE_API_URL`: Source api url
+- `SOURCE_API_KEY`: Source api token/key (if required by your source)
 - `PORTALJS_CLOUD_API_URL`: PortalJS Cloud api url
 - `PORTALJS_CLOUD_API_KEY`: PortalJS Cloud api key for insert/update
 - `PORTALJS_CLOUD_MAIN_ORG`: Main organization name
@@ -18,7 +19,6 @@ Configuration is done via the following environment variables, which can be set 
 ## Custom Harvesters
 
 In order to create custom harvesters for data sources that are not natively supported, you can:
-
 
 1. Create `src/harvesters/custom.ts`.
 2. Extend `BaseHarvester` (or any other pre-built harvester class) and decorate with `@Harvester`.
