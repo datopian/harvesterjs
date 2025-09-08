@@ -55,16 +55,16 @@ CkanActionConfig & {
   start?: number;
   organization?: string;
 }) {
-  const fq = [];
+  const fq:string[] = [];
 
   if (organization) {
-    fq.push(buildOrFq("organization", [organization]));
+    fq.push(buildOrFq("owner_org", [organization]));
   }
 
   const searchParams = new URLSearchParams({
     rows: String(rows),
     start: String(start),
-    fq: fq.join("+"),
+    fq: fq.join(" AND "),
   });
 
   return await CkanRequest.get<
