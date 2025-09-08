@@ -25,7 +25,7 @@ In order to create custom harvesters for data sources that are not natively supp
 3. Implement:
    * `getSourceDatasets()` → fetch and return all datasets from your source.
    * `mapSourceDatasetToTarget()` → convert source dataset schema into the PortalJS Cloud dataset schema.
-4. Set `HARVESTER_NAME=CustomHarvester` in `.env` and run.
+4. Set `HARVESTER_NAME=CustomHarvester` in `.env` and run. The name of your custom harvester is simply the name of the class that defines it.
 
 The base class handles **concurrency, rate limit, retries, upsert**
 
