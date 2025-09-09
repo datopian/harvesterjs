@@ -59,10 +59,10 @@ export async function upsertDataset({
       try {
         return await updateDataset(dataset);
       } catch (updateError) {
-        throw updateError
+        throw JSON.stringify(updateError)
       }
     } else {
-      throw creationError
+      throw JSON.stringify(creationError)
     }
   }
 }
