@@ -30,3 +30,15 @@ export const capitalize = (str: string) =>
 
 export const buildOrFq = (key: string, values: string[]) =>
   `${key}:(${values.join(" OR ")})`;
+
+export function serializeError(e: unknown): string {
+  if (e instanceof Error) {
+    const { name, message, stack, ...rest } = e as any;
+    try {
+      return JSON.stringify({ name, message, stack, ...rest });
+    } catch {
+      return `${name}: ${message}`;
+    }
+  }
+  try { return JSON.stringify(e); } catch { return String(e); }
+}
