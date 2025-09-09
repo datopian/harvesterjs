@@ -2,6 +2,7 @@ import * as Ckan from "./ckan";
 import { env } from "../../config";
 import { PortalJsCloudDataset } from "@/schemas/portaljs-cloud";
 import { CkanRequestError } from "@portaljs/ckan-api-client-js";
+import { serializeError } from "./utils";
 
 const portalConfig = {
   ckanUrl: env.PORTALJS_CLOUD_API_URL,
@@ -59,10 +60,18 @@ export async function upsertDataset({
       try {
         return await updateDataset(dataset);
       } catch (updateError) {
-        throw updateError
+        console.error(
+          `CKAN update dataset failed: ${dataset.name}`,
+          serializeError(updateError)
+        );
+        throw updateError;
       }
     } else {
-      throw creationError
+      console.error(
+        `CKAN create dataset failed: ${dataset.name}`,
+        serializeError(creationError)
+      );
+      throw creationError;
     }
   }
 }

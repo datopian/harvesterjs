@@ -28,8 +28,7 @@ class CkanHarvester<SourceDatasetT extends CkanPackage = CkanPackage> extends Ba
       resources: (pkg.resources || []).map((r: any) => ({
         name: r.name,
         url: r.url,
-        format: r.format,
-        ...(r.id ? { id: r.id } : {}),
+        format: r.format
       })),
 
       language: pkg.language || "EN",
