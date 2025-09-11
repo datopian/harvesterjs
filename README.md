@@ -1,73 +1,118 @@
 # PortalJS Harvesters
 
-This repo provides a **harvester runner** to pull datasets from external sources and upsert them into **PortalJS Cloud** .
+Extendable harvester framework built with TypeScript. Harvest data from a variety of sources into your PortalJS portal.
+
+> [!TIP]
+> [PortalJS Cloud](https://portaljs.com) supported out-of-the-box.
 
 ---
 
+## Built-in Harvesters
+
+The following sources are supported out-of-the-box:
+
+- [CKAN](./src/ckan.ts)
+- [DKAN](./src/dkan.ts)
+
+Comming soon:
+
+- Socrata Open Data
+- OpenDataSoft (ODS)
+- ArcGIS Hub/Portal
+- Dataverse Repository
+
+## Running Harvesters
+
+You can run this tool in any platform that supports Node, such as GitHub actions.
+
+1. Install dependecies with `npm install
+2. Setup the environment variables according to the [configuration](#configuration) section
+3. Run `npm run start`
+
+See the [GitHub action example](https://github.com/datopian/harvesterjs/blob/main/.github/workflows/run-harvester.yml).
+
 ## Configuration
 
-Configuration is done via the following environment variables, which can be set in a `.env` file (see `.env.example`):
-- `HARVESTER_NAME`: Name of the harvester type
-  - Built-in: **CkanHarvester** pulls from CKAN via `package_search` and maps into PortalJS Cloud.
-- `SOURCE_API_URL`: Source api url
-- `SOURCE_API_KEY`: Source api token/key (if required by your source)
-- `PORTALJS_CLOUD_API_URL`: PortalJS Cloud api url
-- `PORTALJS_CLOUD_API_KEY`: PortalJS Cloud api key for insert/update
-- `PORTALJS_CLOUD_MAIN_ORG`: Main organization name
+The following environment variables can be used to configure the tool:
 
+- `HARVESTER_NAME` - E.g., "CkanHarvester". Literally the name of the harvester class as defined in [./src/harvesters](./src/harvesters).
+- `SOURCE_API_URL` - E.g., "http://ckan.com". The source URL from which you want to harvest datasets.
+- `SOURCE_API_KEY` - (Optional) Used for authenticated requests when private data should be harvested.
+- `PORTALJS_CLOUD_API_URL` - (Optional) Defaults to https://api.cloud.portaljs.com/.
+- `PORTALJS_CLOUD_MAIN_ORG` - The name of your main organization in PortalJS Cloud.
+- `PORTALJS_CLOUD_API_KEY` - You can create PortalJS CLoud API keys in your PortalJS Cloud account profile.
+- `DRY_RUN` - (Optional). Whether data should be ingested or just logged. Either `true` or undefined.
 
-## Custom Harvesters
+You can set these environment variables either with a `.env` file or in the runner's environment.
 
-In order to create custom harvesters for data sources that are not natively supported, you can:
+## Development
 
-1. Create `src/harvesters/custom.ts`.
-2. Extend `BaseHarvester` (or any other pre-built harvester class) and decorate with `@Harvester`.
-3. Implement:
-   * `getSourceDatasets()` → fetch and return all datasets from your source.
-   * `mapSourceDatasetToTarget()` → convert source dataset schema into the PortalJS Cloud dataset schema.
-4. Set `HARVESTER_NAME=CustomHarvester` in `.env` and run. The name of your custom harvester is simply the name of the class that defines it.
+For development and testing harvesters locally:
 
-The base class handles **concurrency, rate limit, retries, upsert**
+1. Clone this repo
+2. Install dependencies with `npm i`
+3. Duplicate [`.env.example`](./.env.example) and rename it to `.env`
+4. Customize the `.env` as you'd like (see [configuration](#configuration)) 
+5. Start harvesting with `npm run start`
+
+> [!TIP]
+> Dry runs are supported via the `DRY_RUN` environment variable
+
+## Extending
+
+This tool is built to be extendable by design. It can be customized to harvest data from any source by extending either a preexisting [built-in harvesters](./src/harvesters) or the [base harvester](./src/harvesters/base.ts).
+
+One common use case would be, for example, if you want to havest data from a CKAN instance that uses a customized metadata schema. In this case, you could simply create a new harvester extending the [CKAN harvester](./src/harvesters/ckan.ts) and override the Source to Target mapping.
+
+### Creating a Custom Harvester
+
+1. Create a new file in the `src/harvesters/` directory.
+2. Extend `BaseHarvester` (or any other pre-built harvester class) and decorate it with `@Harvester`.
+3. Implement overrides:
+   * `getSourceDatasets()` → Fetch and return all datasets from your source.
+   * `mapSourceDatasetToTarget()` → Convert source dataset schema into the PortalJS Cloud dataset schema.
+4. Set `HARVESTER_NAME=YourCustomHarvester` in `.env` and run. The name of your custom harvester is simply the name of the class that defines it.
+
+The base harvester handles concurrency, rate limit, retries, upsert, but note that all these can be fleely overriden and customized.
 
 ### Example: Harvester for a CKAN instance with a custom dataset metadata schema
 
-```js
+```ts
+import { CkanPackage } from "@/schemas/ckanPackage";
 import { PortalJsCloudDataset } from "@/schemas/portaljs-cloud";
 import { Harvester } from ".";
-import { BaseHarvester, BaseHarvesterConfig } from "./base";
+import { BaseHarvesterConfig } from "./base";
+import { CkanHarvester } from "./ckan";
 import { env } from "../../config";
 
-type CustomDataset = {
-  name: string;
-  title: string;
-  description: string;
- //...
+type CustomCkanPortalDataset = CkanPackage & {
+    data_owner_email: string;
 };
 
 @Harvester
-class CustomHarvester extends BaseHarvester<CustomDataset> {
+class CustomCkanPortalHarvester extends CkanHarvester<CustomCkanPortalDataset> {
   constructor(args: BaseHarvesterConfig) {
     super(args);
   }
 
-  async getSourceDatasets() {
-    //implement logic to fetch datasets from source
-  }
-
-  mapSourceDatasetToTarget(pkg: CustomDataset): PortalJsCloudDataset {
+  mapSourceDatasetToTarget(pkg: CustomCkanPortalDataset): PortalJsCloudDataset {
     const owner_org = env.PORTALJS_CLOUD_MAIN_ORG;
     return {
-      //map source dataset to PortalJS Cloud
+      owner_org,
+      name: `${owner_org}--${pkg.name}`,
+      title: pkg.title,
+      notes: pkg.notes || "no description",
+      resources: (pkg.resources || []).map((r: any) => ({
+        name: r.name,
+        url: r.url,
+        format: r.format,
+        ...(r.id ? { id: r.id } : {}),
+      })),
+      language: pkg.language || "EN",
+      contact_point: pkg.data_owner_email // <== Custom field to PortalJS Cloud mapping
     };
   }
 }
 
-export { CustomHarvester };
-
+export { CustomCkanPortalHarvester };
 ```
-
-## Notes
-* Target schema: see `src/schemas/portaljs-cloud.d.ts`.
-* Class name must exactly match `HARVESTER_NAME`.
-* Use `DRY_RUN=true` for safe testing.
-
