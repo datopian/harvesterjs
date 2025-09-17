@@ -40,5 +40,15 @@ export function serializeError(e: unknown): string {
       return `${name}: ${message}`;
     }
   }
-  try { return JSON.stringify(e); } catch { return String(e); }
+  try {
+    return JSON.stringify(e);
+  } catch {
+    return String(e);
+  }
+}
+
+export function mapLanguage(lang?: string): "EN" | "FR" | "ES" | "DE" | "IT" {
+  const supported = ["EN", "FR", "ES", "DE", "IT"] as const;
+  const normalized = lang?.trim().toUpperCase();
+  return supported.includes(normalized as any) ? (normalized as any) : "EN";
 }

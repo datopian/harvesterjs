@@ -14,7 +14,13 @@ export async function listAllDatasets({
 
   while (true) {
     const url = `${odsUrl}/api/v2/catalog/datasets?limit=${limit}&offset=${offset}`;
-    const res = await fetch(url);
+    const headers: Record<string, string> = {};
+
+    if (odsAppToken) {
+      headers["Authorization"] = `Bearer ${odsAppToken}`;
+    }
+
+    const res = await fetch(url, { headers });
 
     if (!res.ok) {
       throw new Error(
@@ -24,15 +30,10 @@ export async function listAllDatasets({
 
     const json = await res.json();
 
-    if (!json || !json.length) {
-      break;
-    }
-    
-    const datasets = json.datasets;
+    if (!json || json.datasets.length === 0) break;
 
-    if (!datasets || datasets.length === 0) break;
+    datasets.push(...json.datasets)
 
-    datasets.push(...datasets);
     offset += limit;
   }
 

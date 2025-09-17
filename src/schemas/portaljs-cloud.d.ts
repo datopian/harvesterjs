@@ -1,4 +1,3 @@
-// Auto-generated from CKAN schema
 export interface PortalJsCloudDataset {
   title?: string;
   name: string;
@@ -11,7 +10,7 @@ export interface PortalJsCloudDataset {
   author_email?: string;
   maintainer?: string;
   maintainer_email?: string;
-  language: string;
+  language: "EN" | "FR" | "ES" | "DE" | "IT";
   coverage?: string;
   rights?: string;
   conforms_to?: string;

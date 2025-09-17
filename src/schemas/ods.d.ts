@@ -1,5 +1,3 @@
-// schemas/ods.ts
-
 export interface OdsCatalogResponse {
   total_count: number;
   datasets: OdsCatalogDataset[];
@@ -14,11 +12,13 @@ export interface OdsCatalogDataset {
     has_records: boolean;
     visibility: string;
     features?: string[];
-    attachments?: any[]; // Can be detailed if needed
+    attachments?: any[];
     alternative_exports?: any[];
     data_visible: boolean;
     fields: OdsField[];
-    metas: OdsMetadata
+    metas: {
+      default: OdsMetadata;
+    };
   };
 }
 
