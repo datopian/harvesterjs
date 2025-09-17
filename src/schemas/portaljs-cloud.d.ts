@@ -11,7 +11,7 @@ export interface PortalJsCloudDataset {
   author_email?: string;
   maintainer?: string;
   maintainer_email?: string;
-  language: "EN" | "FR" | "ES" | "DE" | "IT";
+  language: string;
   coverage?: string;
   rights?: string;
   conforms_to?: string;
