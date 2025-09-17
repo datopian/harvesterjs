@@ -16,7 +16,7 @@ The following sources are supported out-of-the-box:
 
 - [CKAN](./src/harvesters/ckan.ts)
 - [DKAN](./src/harvesters/dkan.ts)
-- 🚧 Socrata Open Data
+- [Socrata Open Data](./src/harvesters/socrata.ts)
 - 🚧 OpenDataSoft (ODS)
 - 🚧 ArcGIS Hub/Portal
 - 🚧 Dataverse Repository
