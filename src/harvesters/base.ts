@@ -14,7 +14,7 @@ export type BaseHarvesterConfig = {
 };
 
 export abstract class BaseHarvester<
-  SourceDatasetT extends { [k: string]: string } = any
+  SourceDatasetT extends { [k: string]: any } = any
 > {
   protected config: BaseHarvesterConfig;
 
