@@ -1,4 +1,4 @@
-import { OdsCatalogDataset } from "@/schemas/ods";
+import { OdsCatalogDataset } from "../schemas/ods";
 
 export async function listAllDatasets({
   odsUrl,
