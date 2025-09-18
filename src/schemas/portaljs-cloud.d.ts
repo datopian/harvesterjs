@@ -1,4 +1,3 @@
-// Auto-generated from CKAN schema
 export interface PortalJsCloudDataset {
   title?: string;
   name: string;
