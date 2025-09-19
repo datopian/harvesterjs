@@ -21,7 +21,10 @@ class ArcgisHarvester extends BaseHarvester<ArcgisDataset> {
   mapSourceDatasetToTarget(ds: ArcgisDataset): PortalJsCloudDataset {
     const owner_org = env.PORTALJS_CLOUD_MAIN_ORG;
 
-    const idPart = ds.name ?? ds.id;
+    const idPart = (ds.name ?? ds.id)
+      .toLowerCase()
+      .replace(/[^a-z0-9-_]+/g, "-")
+      .replace(/^-+|-+$/g, "");
 
     const resources: CkanResource[] = [];
 
