@@ -13,7 +13,7 @@ export async function listAllDatasets(dataverseUrl: string): Promise<DataverseDa
   while (true) {
     console.log(`Fetching datasets from page ${start / perPage + 1}`);
     
-    const query = `subject:${encodeURIComponent("Law")}`
+    const query = `*`;
 
     const res = await fetch(
       `${dataverseUrl}/api/search?q=${query}&type=dataset&per_page=${perPage}&start=${start}&subtree=demo`

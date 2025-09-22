@@ -1,7 +1,6 @@
 import { env } from "../../config";
 import {
   DataverseDatasetWithDetails,
-  DataverseMetadataField,
 } from "../schemas/dataverse";
 import { CkanResource, PortalJsCloudDataset } from "../schemas/portaljs-cloud";
 import { getDatasetDetails, listAllDatasets } from "../lib/dataverse";
@@ -35,23 +34,9 @@ class DataverseHarvester extends BaseHarvester<DataverseDatasetWithDetails> {
   ): PortalJsCloudDataset {
     const owner_org = env.PORTALJS_CLOUD_MAIN_ORG;
     const extras: PortalJsCloudDataset["extras"] = [];
-
-    const metadata = ds.__details.latestVersion.metadataBlocks;
-    const version = ds.__details.latestVersion;
-    const tags: { name: string }[] = [];
-
-    const fields: DataverseMetadataField[] = metadata?.citation?.fields || [];
-
-    // Keyword
-    const keywords = fields?.find((f) => f.typeName === "keyword")?.value ?? [];
-    keywords.forEach((k: any) => {
-      const raw = typeof k === "string" ? k : k?.keywordValue;
-      if (typeof raw === "string" && raw.match(/^[\w\-\. ]+$/)) {
-        tags.push({ name: raw });
-      }
-    });
-
     const resources: CkanResource[] = [];
+    const version = ds.__details.latestVersion;
+    const tags: { name: string }[] = ds.keywords?.map( (k)=>({name:k}) )
 
     // Add files as resources
     for (const file of version.files || []) {
@@ -76,7 +61,7 @@ class DataverseHarvester extends BaseHarvester<DataverseDatasetWithDetails> {
       title: ds.name,
       notes: ds.description || "No description",
       author: ds.author,
-      language: "EN",
+      language: "EN", //dataverse does not natively support full multilingual dataset metadata
       resources,
       tags,
       extras,

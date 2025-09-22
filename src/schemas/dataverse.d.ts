@@ -15,6 +15,7 @@ export interface DataverseDataset {
   fileCount: number;
   author: string;
   identifier_of_dataverse: string;
+  keywords:string[]
 }
 
 export interface DataverseDatasetWithDetails extends DataverseDataset {
