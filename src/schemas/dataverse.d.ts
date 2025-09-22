@@ -15,7 +15,10 @@ export interface DataverseDataset {
   fileCount: number;
   author: string;
   identifier_of_dataverse: string;
-  keywords:string[]
+  keywords:string[];
+  majorVersion:number;
+  minorVersion:number;
+  versionState:string;
 }
 
 export interface DataverseDatasetWithDetails extends DataverseDataset {
@@ -23,6 +26,7 @@ export interface DataverseDatasetWithDetails extends DataverseDataset {
 }
 
 export interface DataverseDatasetMetadata {
+  publisher:string;
   latestVersion: {
     metadataBlocks: Record<string, any>;
     files?: DataverseFile[];

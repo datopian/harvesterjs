@@ -52,6 +52,14 @@ class DataverseHarvester extends BaseHarvester<DataverseDatasetWithDetails> {
     extras.push({ key: "Source URL", value: ds.url });
     extras.push({ key: "Global ID", value: ds.global_id });
     extras.push({ key: "Last Harvested At", value: new Date().toISOString() });
+    extras.push({ key: "Version", value: `${ds.majorVersion}.${ds.minorVersion}` });
+    extras.push({ key: "Version State", value: ds.versionState });
+    extras.push({
+      key: "Version History URL",
+      value: `${this.config.source.url}/dataset.xhtml?persistentId=${ds.global_id}`,
+    });
+    extras.push({ key: "Publisher", value: ds.__details.publisher });
+    extras.push({ key: "DOI", value: ds.global_id });
 
     return {
       owner_org,
