@@ -19,7 +19,7 @@ The following sources are supported out-of-the-box:
 - [Socrata Open Data](./src/harvesters/socrata.ts)
 - [OpenDataSoft (ODS)](./src/harvesters/ods.ts)
 - 🚧 ArcGIS Hub/Portal
-- [Dataverse Repository](./src/harvesters/dataverse.ts)🚧 
+- [Dataverse Repository](./src/harvesters/dataverse.ts)
 
 ## Running Harvesters
 
