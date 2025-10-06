@@ -12,7 +12,7 @@ With out-of-the-box support to 🌀 [PortalJS Cloud](https://portaljs.com)
 
 ## Built-in Harvesters
 
-The following sources are supported out-of-the-box:
+The following sources are supported out of the box:
 
 - [CKAN](./src/harvesters/ckan.ts)
 - [DKAN](./src/harvesters/dkan.ts)
@@ -21,12 +21,18 @@ The following sources are supported out-of-the-box:
 - [Dataverse Repository](./src/harvesters/dataverse.ts)
 - [ArcGIS Hub/Portal](./src/harvesters/arcgis.ts)
 
+## Getting Started
+
+This tool is intended as a template/starter framework rather than a standalone deployable app. The idea is that you use this repo as the base for your own harvesting tool, customizing it and integrating it into your workflow.
+
+To get started, click on the "Use This Template" button in the top-right corner of this page and then click on "Create a new repository".
+
 ## Running Harvesters
 
-You can run this tool in any platform that supports Node, such as GitHub actions.
+You can run this tool on any platform that supports Node, such as GitHub Actions.
 
-1. Install dependecies with `npm install`
-2. Setup the environment variables according to the [configuration](#configuration) section
+1. Install dependencies with `npm install`
+2. Set up the environment variables according to the [configuration](#configuration) section
 3. Run `npm run start`
 
 See the [GitHub Action example](https://github.com/datopian/harvesterjs/blob/main/.github/workflows/run-harvester.yml).
@@ -64,7 +70,7 @@ This tool is built to be extendable by design.
 
 It can be customized to harvest data from any source by extending either a preexisting [built-in harvesters](./src/harvesters) or the [base harvester](./src/harvesters/base.ts).
 
-One common use case would be, for example, if you want to havest data from a CKAN instance that uses a custom metadata schema. 
+One common use case would be, for example, if you want to harvest data from a CKAN instance that uses a custom metadata schema. 
 
 In this case, you could simply create a new harvester extending the [CKAN harvester](./src/harvesters/ckan.ts) and override the Source to Target mapping, as shown in the example below.
 
